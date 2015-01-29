@@ -247,5 +247,59 @@ Not under SCM.
 <b>STACK_ROOT/ubuntu-nginx-php-mysql/php</b> - This contains the php installation that was built from the above. Not under SCM.
 
 
+<h3>IV. Install php-fpm.</h3>
+
+php-fpm has already been installed via our installation of php.  The versioning is not relevant because it's
+whatever version comes with PHP 5.6.5.  We do however need to configure php-fpm and learn a bit about its 
+ways and customs.
+
+1. Determine a port for the initial configuration to listen to.  By default it's port 9000.  For this example
+let's use 9001.
+
+PHPFMP_DEFAULT_PORT = 9001
+
+2. Use a custom built configuration provided by this project.
+
+<b>cp STACK_ROOT/ubuntu-nginx-php-mysql/php-fpm-conf/php-fpm.conf STACK_ROOT/ubuntu-nginx-php-mysql/php/etc</b>
+
+The stock configuration is filled with commented out examples.  This just confuses everything.
+The custom built config has _nothing_ except things we specifically want.  We'll otherwise just rely on
+the default operation of php-fpm until and unless we specifically decide otherwise.
+
+3. Verify basic installation and operation:
+
+Help, version, info.
+
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/sbin/php-fpm --help</b>
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/sbin/php-fpm -v</b>
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/sbin/php-fpm -i</b>
+
+Test the configuration file:
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/sbin/php-fpm -t</b>
+
+This will start the server.
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/sbin/php-fpm</b>
+
+Verify that php-fpm is listening on the expected port:
+<b>netstat -lnp  | grep "php-fpm"</b>
+Do you see "0 0.0.0.0:PHP-PFM_DEFAULT_PORT" and "LISTEN"?
+
+Restart the server and reload the config.
+<b>ps -A | grep "php-fpm"</b>
+<b>kill -9 nnnn nnnn nnnn ... </b>
+
+The first command lists the processes visible to this users and will grep the results to only display those
+relevant to php-fpm. 
+
+The second command will kill these processes.  Please substitute nnnn for the actual PIDs from PS.
+
+4. Review the directory structure, relevant to php-fpm.  Recall that php-fpm was installed with PHP so therefore
+php-fpm will not have it's own original installation media or extracted source or installation directory.
+
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/php-fpm-conf</b> - This contains the versioned configuration files that we develop.
+
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/sbin/php-fpm</b> - This is the executable binary.
+
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/etc/php-fpm.conf</b> - This is the configuration file.
 
 
