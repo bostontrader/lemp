@@ -34,6 +34,7 @@ cmake
 git-core
 g++
 libncurses5
+libxml2-dev - for php
 
 <h2>Rebuild</h2>
 Ok, here we go...
@@ -194,3 +195,57 @@ Not under SCM.
 </li>
 
 </ol>
+
+<h3>III. Install PHP</h3>
+
+Now install PHP 5.6.5.  This release also includes php-fpm so that will be installed as well.
+We will however configure php-fpm separately.
+
+1. <b>Ensure that you're in the STACK_ROOT/ubuntu-nginx-php-mysql directory.</b>
+
+2. <b>wget http://hk1.php.net/distributions/php-5.6.5.tar.bz2</b>
+
+3. <b>tar -xvf php-5.6.5.tar.bz2</b>
+
+4. <b>cd php-5.6.5</b>
+
+5. <b>./configure --help</b>  This is optional but possibly useful. Possibly review the modules being loaded and exclude some of them.
+
+6. <b>./configure --prefix=STACK_ROOT/ubuntu-nginx-php-mysql/php --enable-fpm --with-mysql=STACK_ROOT/ubuntu-nginx-php-mysql/mysql</b>
+
+We need fpm!
+
+7. <b>make --help</b> Optional.
+
+8. <b>make</b>
+
+9. <b>make test</b>  This may reveal some minor errors.  Don't worry about them.
+
+10. <b>make install</b>
+
+Note: After installation, there is no initial php.ini.  This will be added later.
+
+11. Verify basic installation and operation of php.
+
+Look for version or info about php.
+<p>STACK_ROOT/ubuntu-nginx-php-mysql/php/bin/php --version</b>  Does this say 5.6.5?
+
+Look at the info....
+<p>STACK_ROOT/ubuntu-nginx-php-mysql/php/bin/php --info</b>
+
+Narrow the search for "Loaded Configuration".  Is php using the php.ini we expect?
+At this point, there should be none loaded at all.
+<p>STACK_ROOT/ubuntu-nginx-php-mysql/php/bin/php --info | grep "Loaded Configuration"</b>
+
+12. Review the directory structure, relevant to php.
+
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/php-5.6.5.tar.bz2</b> - This is the original installation media.  Not under SCM.
+
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/php-5.6.5</b> - This is the installation source code as extracted from the above.
+Not under SCM.
+
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/php</b> - This contains the php installation that was built from the above. Not under SCM.
+
+
+
+
