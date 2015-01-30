@@ -1,0 +1,57 @@
+# (1) http://wiki.nginx.org/DirectiveIndex
+# (2) https://nealpoole.com/blog/2011/04/setting-up-php-fastcgi-and-nginx-dont-trust-the-tutorials-check-your-configuration/
+# (3) http://codex.wordpress.org/Nginx
+# (4) http://nginx.org/en/docs/http/ngx_http_fastcgi_module.html
+
+# (1) The worker_connections and worker_processes from the main section allows you to calculate max clients you can handle:
+# max clients = worker_processes * worker_connections
+
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+	server {
+		listen 3000;
+
+		# Be sure to replace STACK_ROOT with the real value
+        root STACK_ROOT/ubuntu-nginx-php-mysql/html;
+
+		location ~ \.php$ {
+			fastcgi_pass   localhost:9001;
+
+			# The fastcgi_params are by default mixed into fastcgi.conf and fastcgi_params.conf.
+			# For now I'd rather have them here where I can see them. 
+			# I've commented most of them out until I discover a specific reason for them. 
+
+			# These two are the bare minimum required... (4)
+			fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+			fastcgi_param  QUERY_STRING       $query_string;
+
+			# Post requests need these three... (4)
+			fastcgi_param  REQUEST_METHOD     $request_method;
+			fastcgi_param  CONTENT_TYPE       $content_type;
+			fastcgi_param  CONTENT_LENGTH     $content_length;	
+
+			#fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+			#fastcgi_param  REQUEST_URI        $request_uri;
+			#fastcgi_param  DOCUMENT_URI       $document_uri;
+			#fastcgi_param  DOCUMENT_ROOT      $document_root;
+			#fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+			#fastcgi_param  HTTPS              $https if_not_empty;
+
+			#fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+			#fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+	
+			#fastcgi_param  REMOTE_ADDR        $remote_addr;
+			#fastcgi_param  REMOTE_PORT        $remote_port;
+			#fastcgi_param  SERVER_ADDR        $server_addr;
+			#fastcgi_param  SERVER_PORT        $server_port;
+			#fastcgi_param  SERVER_NAME        $server_name;
+
+		}
+	}
+
+}

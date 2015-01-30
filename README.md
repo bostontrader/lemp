@@ -340,7 +340,7 @@ by this project.</li>
 
 <li><b>rm -rf STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf/*</b>  Remove the contents of the existing directory.</li>
 
-<li><b>ln -s /home/godzilla/ubuntu-nginx-php-mysql/nginx-conf/nginx.conf /home/godzilla/ubuntu-nginx-php-mysql/nginx/conf/nginx.conf</b>  Link to new config</li>
+<li><b>ln -s STACK_ROOT/ubuntu-nginx-php-mysql/nginx-conf/nginx.conf STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf/nginx.conf</b>  Link to new config</li>
 
 The stock configuration is filled with commented out examples.  This just confuses everything.
 The custom built config has _nothing_ except things we specifically want.  We'll just rely on
@@ -390,5 +390,23 @@ which is the binaries, configuration, log files, and html to serve.  Not under S
 <b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx-conf</b> - This contains the versioned configuration files that we develop, that are later copied into the STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf directory.
 </li>
 </ol>
+
+<h3>VI. phpinfo() via PHP & Nginx</h3>
+
+Now it's time to modify our configuration so that we can view a .php file, that contains a call to phpinfo()
+and view this in the browser, via nginx.  Since we're using php-fpm, we'll have to get that properly configured as well.
+
+1. Replace the installed nginx configuration directory with the custom built configuration provided
+by this project.  Note: This is the 2nd custom config that we're using.
+
+<li><b>ln -s STACK_ROOT/ubuntu-nginx-php-mysql/nginx-conf/nginx.conf2 STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf/nginx.conf</b>  Link to new config</li>
+
+2. Turn on (or reload) nginx.
+
+3. Turn on php-fpm.
+
+4. From your browser of choice, navigate to localhost:NGINX_DEFAULT_PORT/phpinfo.php.  Do you see the php info message?
+
+
 
 
