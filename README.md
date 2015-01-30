@@ -399,7 +399,10 @@ and view this in the browser, via nginx.  Since we're using php-fpm, we'll have 
 1. Replace the installed nginx configuration directory with the custom built configuration provided
 by this project.  Note: This is the 2nd custom config that we're using.
 
-<li><b>ln -s STACK_ROOT/ubuntu-nginx-php-mysql/nginx-conf/nginx.conf2 STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf/nginx.conf</b>  Link to new config</li>
+<li><b>ln -sf STACK_ROOT/ubuntu-nginx-php-mysql/nginx-conf/nginx.conf2 STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf/nginx.conf</b>  Link to new config.  This time you'll 
+want to force (f) the link to replace the existing link.</li>
+
+<li>Edit nginx/conf/nginx.conf to replace any references to STACK_ROOT with the actual value.</li>
 
 2. Turn on (or reload) nginx.
 
