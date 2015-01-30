@@ -30,7 +30,6 @@ Starting from a fresh install of Ubuntu 14.04 LTS, I needed to install the follo
 to get all this to work:
 
 <table>
-<tr>
 <th><td>Package name</td><td>Why?</td></th>
 <tr><td>build-essential</td><td></td></tr>
 <tr><td>cmake</td><td></td></tr>
