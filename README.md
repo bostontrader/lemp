@@ -260,11 +260,12 @@ PHPFMP_DEFAULT_PORT = 9001
 
 2. Use a custom built configuration provided by this project.
 
-<b>cp STACK_ROOT/ubuntu-nginx-php-mysql/php-fpm-conf/php-fpm.conf STACK_ROOT/ubuntu-nginx-php-mysql/php/etc</b>
-
 The stock configuration is filled with commented out examples.  This just confuses everything.
 The custom built config has _nothing_ except things we specifically want.  We'll otherwise just rely on
 the default operation of php-fpm until and unless we specifically decide otherwise.
+
+<b>ln -s STACK_ROOT/ubuntu-nginx-php-mysql/php-fpm-conf/php-fpm.conf STACK_ROOT/ubuntu-nginx-php-mysql/php/etc/php-fpm.conf</b>
+
 
 3. Verify basic installation and operation:
 
