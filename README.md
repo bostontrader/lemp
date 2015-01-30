@@ -31,14 +31,9 @@ to get all this to work:
 
 <table>
 <th><td>Package name</td><td>Why?</td></th>
-<tr><td>build-essential</td><td></td></tr>
-<tr><td>cmake</td><td></td></tr>
-<tr><td>git-core</td><td></td></tr>
-<tr><td>g++</td><td></td></tr>
-<tr><td>libncurses5</td><td></td></tr>
-<tr><td>libpcre3-dev</td><td>nginx</td></tr>
-<tr><td>libxml2-dev</td><td>php</td></tr>
 </table>
+
+
 
 <h2>Rebuild</h2>
 Ok, here we go...
