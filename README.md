@@ -29,13 +29,17 @@ conveniently need to sudo or root access to install these tools, if they are not
 Starting from a fresh install of Ubuntu 14.04 LTS, I needed to install the following extra packages
 to get all this to work:
 
-build-essential
-cmake
-git-core
-g++
-libncurses5
-libpcre3-dev - nginx
-libxml2-dev  - php
+<table>
+<tr>
+<th><td>Package name</td><td>Why?</td></th>
+<tr><td>build-essential</td><td></td></tr>
+<tr><td>cmake</td><td></td></tr>
+<tr><td>git-core</td><td></td></tr>
+<tr><td>g++</td><td></td></tr>
+<tr><td>libncurses5</td><td></td></tr>
+<tr><td>libpcre3-dev</td><td>nginx</td></tr>
+<tr><td>libxml2-dev</td><td>php</td></tr>
+</table>
 
 <h2>Rebuild</h2>
 Ok, here we go...
