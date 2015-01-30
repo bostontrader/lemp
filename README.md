@@ -338,9 +338,9 @@ Now it's to install nginx version 1.7.9.
 <li>Replace the installed configuration directory with the custom built configuration provided
 by this project.</li>
 
-<li><b>rm -rf STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf</b>  Remove the existing directory.</li>
+<li><b>rm -rf STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf/*</b>  Remove the contents of the existing directory.</li>
 
-<li><b>cp -R STACK_ROOT/ubuntu-nginx-php-mysql/nginx-conf/conf1 STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf</b>
+<li><b>ln -s /home/godzilla/ubuntu-nginx-php-mysql/nginx-conf/nginx.conf /home/godzilla/ubuntu-nginx-php-mysql/nginx/conf/nginx.conf</b>  Link to new config</li>
 
 The stock configuration is filled with commented out examples.  This just confuses everything.
 The custom built config has _nothing_ except things we specifically want.  We'll just rely on
@@ -353,7 +353,9 @@ Test the configuration file:
 <b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx/sbin/nginx -t</b>
 
 This will start the server.
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx/sbin/nginx</b>
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx/sbin/nginx &</b>
+
+Recall that the "&" symbol makes this command run as a daemon.
 
 Verify that nginx is listening on the expected port:
 <b>netstat -lnp  | grep "nginx"</b>
