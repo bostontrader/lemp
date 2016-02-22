@@ -1,19 +1,25 @@
 <h1>Introduction</h1>
 The purpose of this directory is to provide/document a build process that
-can build from scratch a stack, for Ubuntu 14, composed of nginx, php, php-fpm, and mysql.
+can build from scratch a LEMP stack, for Ubuntu 15, composed of nginx, php, php-fpm, and mysql.
+
+More specifically, we're going to download the source code and build from scratch, the following packages and versions:
+<table>
+<tr><td>Package</td><td>Version</td></tr>
+<tr><td>MySQL</td><td>5.7.11</tr>
+</table>
 
 <h2>Rebuild from Source Code</h2>
 This process will use .tar.gz (or similar) files containing the source code for all of the above.
-We want to be able to very carefully rebuild the same stack, every time, starting from exactly 
+We want to be able to very carefully rebuild the same stack, every time, starting from exactly
 the same source code.  Attempting to do this using the SCM repos of the various
 programs is needlessly complicated because these programs use several different systems.
-And attempting to do this using whatever package manager is available on a specific system is 
-troublesome because the different packages will likely contain subtle differences that may introduce bugs.
+And attempting to do this using whatever package manager is available on a specific system is
+troublesome because the different packages will likely contain subtle differences that will likely cause grief.
 
 <h2>This Stack is Not Entwined With The Rest Of The System</h2>
 All of the installation is contained within this directory and uses non-standard ports and user names.  This
 stack may thus be easily deleted and rebuilt without affecting other packages on the system.  One reason for using
-non-standard ports is to ensure that we really are dealing with this software and not pre-existing
+non-standard ports, in additional to a minor security boost, is to ensure that we really are dealing with this software and not pre-existing
 instances that may have been installed previously.
 
 <h2>Install/Execute as Ordinary User</h2>
@@ -23,11 +29,14 @@ certain non-standard ports.  For example, an ordinary user cannot run a process 
 
 <h2>Prerequisites</h2>
 Although nginx, php, php-fpm, and mysql can all be installed and executed as an ordinary user,
-the host system still needs a variety of tools such as build tools and compilers.  You will most
+the host system still needs a variety of tools build tools.  You will most
 conveniently need to sudo or root access to install these tools, if they are not already installed.
 
-Starting from a fresh install of Ubuntu 14.04 LTS, I needed to install the following extra packages
+Starting from a fresh install of Ubuntu 15.10, I needed to install the following extra packages
 to get all this to work:
+
+<table>
+</table>
 
 <table>
 <tr><th>Package name</th><th>Why?</th></tr>
@@ -40,6 +49,8 @@ to get all this to work:
 <tr><td>libxml2-dev</td><td>php</td></tr>
 </table>
 
+Unfortunately, installing all this is outside the scope of this document, so you're on your own with this.
+
 <h2>Rebuild</h2>
 Ok, here we go...
 
@@ -47,23 +58,22 @@ Ok, here we go...
 <ol>
 
 <li>
-Determine a file-system location for this installation.  Let's refer to that location as STACK_ROOT.  Warning:
+<p>Determine a file-system location for this installation.  Let's refer to that location as STACK_ROOT. In fact, let's export that as an environment variable.</p><p><b>export STACK_ROOT="/home/myhome/lemp"</b></p>  <p>Warning:
 I tried this once using a user's home directory as the STACK_ROOT, which I referred to using the "~".
-But make install didn't install anything.  So I tried again, using the same directory, but this time
-using the absolute path instead.  This worked.
+But subsequent <b>make install</b> didn't install anything.  So I tried again, using the same directory, but this time
+using the absolute path instead.  This worked.</p>
 </li>
-
-<li><b>cd STACK_ROOT</b></li>
 
 <li>
-Remove any prior installation, if desired.<br>
-<b>rm -rf STACK_ROOT/ubuntu-nginx-php-mysql</b>.<br>
-This command will remove this directory, all files and subdirectories within (r) and force it without any prompts (f).
+<p>Remove any prior installation, if desired.</p>
+<p><b>rm -rf $STACK_ROOT</b></p>
+<p>This command will remove this directory, all files and subdirectories within (r) and force it without any prompts (f).</p>
 </li>
 
-<li><b>git clone https://github.com/bostontrader/ubuntu-nginx-php-mysql.git</b></li>
+<li><p><b>mkdir $STACK_ROOT</b></p></li>
+<li><p><b>cd $STACK_ROOT</b></p></li>
+<li><p><b>git clone https://github.com/bostontrader/ubuntu-nginx-php-mysql.git .</b> <p>(Warning! The "dot" at the end of the command is required. Don't overlook this.)</p></li>
 
-<li><b>cd STACK_ROOT/ubuntu-nginx-php-mysql</b></li>
 </ol>
 
 
@@ -73,17 +83,19 @@ Let's install MySQL first.  This is the most complicated part and if you can get
 then the rest of the installation will be easier.  Also, the PHP installation needs MySQL
 so we need to install this first.
 
+Since our goal is specifically to build from source code, we'll neglect to use any easier installation methods such as package managers.  A good starting point for building from source is http://dev.mysql.com/doc/refman/5.7/en/source-installation.html
+
 There are a few issues to consider when installing MySQL:
 
 <ul>
 
-<li>Which directory will contain the database files?  Not the binaries or configuration, but the database
-files themselves.</li>
+<p><li>Which directory will contain the database files?  Not the binaries or configuration, but the database
+files themselves.</li></p>
 
-<li>How do we carefully control where configuration information comes from?  This can be confusing because
-MySQL will routinely look in several places and we can easily mix in config from other installations.</li>
+<p><li>How do we carefully control where configuration information comes from?  This can be confusing because
+MySQL will routinely look in several places and we can easily mix in config from other installations.</li></p>
 
-<li>Which user should be the owner of the database files?</li>
+<p><li>Which user and group should be the owner of the database files?</li></p>
 
 </ul>
 
@@ -91,18 +103,28 @@ That said, let's doit...
 
 <ol>
 
-<li>Determine a port for the configuration to listen to.  The MySQL default port = 3306 so in this example we'll use
-MYSQL_DEFAULT_PORT = 3307.</li>
+<li><p>Earlier I referenced the starting point in the MySQL docs for building the source code.  A more specific reference for our purposes now can be found at:</br>http://dev.mysql.com/doc/refman/5.7/en/installing-source-distribution.html</p></li>
 
-<li>Designate a particular user to be the owner of the db files.  DB_USER=<whatever>.</li>
+<li><p>Determine a port for the configuration to listen to.  The MySQL default port = 3306 so let's secure by obscurity and use a different port:</br>
+<b>export MYSQL_DEFAULT_PORT = 3307</b></p></li>
 
-<li>Ensure that you're in the STACK_ROOT/ubuntu-nginx-php-mysql directory.</li>
+<li><p>The access rights for the various files are customarily set according to a user=mysql and a group=mysql.  Let's thwart our determined nemeses and use different names:</br><b>export MYSQL_USER=batman</b></br><b>export MYSQL_GROUP=catwoman</b></p></li>
 
-<li><b>wget http://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.22.tar.gz</b></li>
+<li>
+<p>Add the group and user:
+</br><b>groupadd $MYSQL_GROUP</b>
+</br><b>useradd -r -g $MYSQL_GROUP -s /bin/false $MYSQL_USER</b></p>
+</li>
 
-<li><b>tar -xvf mysql-5.6.22.tar.gz</b></li>
+<li><p>Ensure that you're in the STACK_ROOT directory.</p></li>
 
-<li><b>cd mysql-5.6.22</b></li>
+<li><p><b>wget http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.11-linux-glibc2.5-x86_64.tar</b></p></li>
+
+<li><p><b>tar -xvf mysql-5.7.11-linux-glibc2.5-x86_64.tar</b></p>
+<p>This will extract two tar.gz files:</br>mysql-5.7.11-linux-glibc2.5-x86_64.tar.gz</br>mysql-test-5.7.11-linux-glibc2.5-x86_64.tar.gz
+</p></li>
+
+<li><p><b>cd mysql-5.6.22</b></p></li>
 
 <li><b>cmake -L</b>
 Optional.  Gives a brief overview of important configuration parameters. You can change their values
@@ -124,7 +146,7 @@ why taunt fate?  Feel free to figure this out at your leisure.</li>
 
 <li>
 Now we need to install the beginning db that MySQL itself needs in order to function.  For example, the
-grant tables. 
+grant tables.
 
 <b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql/scripts/mysql_install_db --no-defaults --datadir=STACK_ROOT/ubuntu-nginx-php-mysql/mysql/data  --srcdir=STACK_ROOT/ubuntu-nginx-php-mysql/mysql-5.6.22</b>
 
@@ -145,7 +167,7 @@ a default conf file, we don't want to use it.  Instead, we'll feed the binaries 
 The following options are typically used for our application:
 
 <ul>
-<li><b>--no-defaults</b>  If we don't carefully suppress the use of any 
+<li><b>--no-defaults</b>  If we don't carefully suppress the use of any
 default configuration files, MarieDb will diligently try to find some configuration and it may find
 and use configuration from some other installation.  So we generally want to use this option to prevent that.
 </li>
@@ -160,8 +182,8 @@ mysql will typically use the currently logged in user.</li>
 </li>
 
 <li>That said... turn on the MySQL server.
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql/bin/mysqld_safe --no-defaults 
-  --log-error=STACK_ROOT/ubuntu-nginx-php-mysql --datadir=STACK_ROOT/ubuntu-nginx-php-mysql/mysql/data 
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql/bin/mysqld_safe --no-defaults
+  --log-error=STACK_ROOT/ubuntu-nginx-php-mysql --datadir=STACK_ROOT/ubuntu-nginx-php-mysql/mysql/data
   --port=3307</b>
 
 Note: No --protocol option used.  Must be implied because of the --port option.
@@ -190,10 +212,10 @@ Stop the server, ending any processes it had.
 
 <b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql-5.6.22.tar.gz</b> - This is the original installation media.  Not under SCM.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql-5.6.22</b> - This is the installation source code as extracted from the above. 
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql-5.6.22</b> - This is the installation source code as extracted from the above.
 Not under SCM.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql</b> - This contains the MySQL installation that was built from the above. 
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql</b> - This contains the MySQL installation that was built from the above.
 Not under SCM.
 
 </li>
@@ -254,7 +276,7 @@ Not under SCM.
 <h3>IV. Install php-fpm.</h3>
 
 php-fpm has already been installed via our installation of php.  The versioning is not relevant because it's
-whatever version comes with PHP 5.6.5.  We do however need to configure php-fpm and learn a bit about its 
+whatever version comes with PHP 5.6.5.  We do however need to configure php-fpm and learn a bit about its
 ways and customs.
 
 1. Determine a port for the initial configuration to listen to.  By default it's port 9000.  For this example
@@ -294,7 +316,7 @@ Restart the server and reload the config.
 <b>kill -9 nnnn nnnn nnnn ... </b>
 
 The first command lists the processes visible to this users and will grep the results to only display those
-relevant to php-fpm. 
+relevant to php-fpm.
 
 The second command will kill these processes.  Please substitute nnnn for the actual PIDs from PS.
 
@@ -384,10 +406,10 @@ Stop the server, ending any processes it had.
 
 <b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx-1.7.9.tar.gz</b> - This is the original installation media.  Not under SCM.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx-1.7.9</b> - This is the installation source code as extracted from the above. 
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx-1.7.9</b> - This is the installation source code as extracted from the above.
 Not under SCM.  Note: this also contains the original configuration.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx</b> - This contains the nginx installation that was built from the above, 
+<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx</b> - This contains the nginx installation that was built from the above,
 which is the binaries, configuration, log files, and html to serve.  Not under SCM.
 
 <b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx-conf</b> - This contains the versioned configuration files that we develop, that are later copied into the STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf directory.
@@ -402,7 +424,7 @@ and view this in the browser, via nginx.  Since we're using php-fpm, we'll have 
 1. Replace the installed nginx configuration directory with the custom built configuration provided
 by this project.  Note: This is the 2nd custom config that we're using.
 
-<li><b>ln -sf STACK_ROOT/ubuntu-nginx-php-mysql/nginx-conf/nginx.conf2 STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf/nginx.conf</b>  Link to new config.  This time you'll 
+<li><b>ln -sf STACK_ROOT/ubuntu-nginx-php-mysql/nginx-conf/nginx.conf2 STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf/nginx.conf</b>  Link to new config.  This time you'll
 want to force (f) the link to replace the existing link.</li>
 
 <li>Edit nginx/conf/nginx.conf to replace any references to STACK_ROOT with the actual value.</li>
@@ -412,7 +434,3 @@ want to force (f) the link to replace the existing link.</li>
 3. Turn on php-fpm.
 
 4. From your browser of choice, navigate to localhost:NGINX_DEFAULT_PORT/phpinfo.php.  Do you see the php info message?
-
-
-
-
