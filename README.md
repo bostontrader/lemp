@@ -1,5 +1,5 @@
 <h1>Introduction</h1>
-The purpose of this directory is to provide/document a build process that
+The purpose of this document is to provide/document a build process that
 can build from scratch a LEMP stack, for Ubuntu 15, composed of nginx, php, php-fpm, and mysql.
 
 More specifically, we're going to download the source code and build from scratch, the following packages and versions:
@@ -36,13 +36,13 @@ Starting from a fresh install of Ubuntu 15.10, I needed to install the following
 to get all this to work:
 
 <table>
+<tr><th>Package name</th><th>Why?</th></tr>
+<tr><td>cmake</td><td>MySQL</td></tr>
 </table>
 
 <table>
 <tr><th>Package name</th><th>Why?</th></tr>
 <tr><td>build-essential</td><td></td></tr>
-<tr><td>cmake</td><td></td></tr>
-<tr><td>git-core</td><td></td></tr>
 <tr><td>g++</td><td></td></tr>
 <tr><td>libncurses5</td><td></td></tr>
 <tr><td>libpcre3-dev</td><td>nginx</td></tr>
@@ -72,7 +72,6 @@ using the absolute path instead.  This worked.</p>
 
 <li><p><b>mkdir $STACK_ROOT</b></p></li>
 <li><p><b>cd $STACK_ROOT</b></p></li>
-<li><p><b>git clone https://github.com/bostontrader/ubuntu-nginx-php-mysql.git .</b> <p>(Warning! The "dot" at the end of the command is required. Don't overlook this.)</p></li>
 
 </ol>
 
@@ -108,7 +107,7 @@ That said, let's doit...
 <li><p>Determine a port for the configuration to listen to.  The MySQL default port = 3306 so let's secure by obscurity and use a different port:</br>
 <b>export MYSQL_DEFAULT_PORT = 3307</b></p></li>
 
-<li><p>The access rights for the various files are customarily set according to a user=mysql and a group=mysql.  Let's thwart our determined nemeses and use different names:</br><b>export MYSQL_USER=batman</b></br><b>export MYSQL_GROUP=catwoman</b></p></li>
+<li><p>The access rights for the various files are customarily set according to a user=mysql and a group=mysql.  As with the port, let's again thwart our determined nemeses and use different names:</br><b>export MYSQL_USER=batman</b></br><b>export MYSQL_GROUP=catwoman</b></p></li>
 
 <li>
 <p>Add the group and user:
@@ -118,23 +117,29 @@ That said, let's doit...
 
 <li><p>Ensure that you're in the STACK_ROOT directory.</p></li>
 
-<li><p><b>wget http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.11-linux-glibc2.5-x86_64.tar</b></p></li>
+<li><p><b>wget http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-boost-5.7.11.tar.gz</b></p><p>This downloads the source code, including some c++ boost source/headers.</p></li>
 
-<li><p><b>tar -xvf mysql-5.7.11-linux-glibc2.5-x86_64.tar</b></p>
-<p>This will extract two tar.gz files:</br>mysql-5.7.11-linux-glibc2.5-x86_64.tar.gz</br>mysql-test-5.7.11-linux-glibc2.5-x86_64.tar.gz
+<li><p><b>tar xvf mysql-5.7.11.tar.gz</b></p>
 </p></li>
 
-<li><p><b>cd mysql-5.6.22</b></p></li>
+<li><p><b>cd mysql-5.7.11</b></p>
+</p></li>
 
-<li><b>cmake -L</b>
+<li><p><b>cmake -L</b></br>
 Optional.  Gives a brief overview of important configuration parameters. You can change their values
-by using the -D option.  See supra for example.
+by using the -D option.  See supra for example.</p>
 </li>
 
-<li><b>cmake . -DCMAKE_INSTALL_PREFIX=STACK_ROOT/ubuntu-nginx-php-mysql/mysql -DMYSQL_DATADIR=STACK_ROOT/ubuntu-nginx-php-mysql/mysql</b>
+<li><p><b>cmake . -DCMAKE_INSTALL_PREFIX=$STACK_ROOT/mysql -DMYSQL_DATADIR=$STACK_ROOT/mysql</b>
 
 Note: It's probably best to not use a ~ in STACK_ROOT.  Maybe that would work but
-why taunt fate?  Feel free to figure this out at your leisure.</li>
+why taunt fate?  Feel free to figure this out at your leisure.</p></li>
+
+
+<li><p><b>cmake . -DCMAKE_INSTALL_PREFIX=STACK_ROOT/ubuntu-nginx-php-mysql/mysql -DMYSQL_DATADIR=STACK_ROOT/ubuntu-nginx-php-mysql/mysql</b>
+
+Note: It's probably best to not use a ~ in STACK_ROOT.  Maybe that would work but
+why taunt fate?  Feel free to figure this out at your leisure.</p></li>
 
 <li>If you want to start over with cmake, then do <b>rm CMakeCache.txt</b></li>
 
