@@ -37,14 +37,14 @@ to get all this to work:
 
 <table>
 <tr><th>Package name</th><th>Why?</th></tr>
-<tr><td>cmake</td><td>MySQL</td></tr>
+<tr><td>cmake</td><td>Build MySQL</td></tr>
+<tr><td>libncurses5-dev</td><td>Build MySQL</td></tr>
 </table>
 
 <table>
 <tr><th>Package name</th><th>Why?</th></tr>
 <tr><td>build-essential</td><td></td></tr>
 <tr><td>g++</td><td></td></tr>
-<tr><td>libncurses5</td><td></td></tr>
 <tr><td>libpcre3-dev</td><td>nginx</td></tr>
 <tr><td>libxml2-dev</td><td>php</td></tr>
 </table>
@@ -105,7 +105,7 @@ That said, let's doit...
 <li><p>Earlier I referenced the starting point in the MySQL docs for building the source code.  A more specific reference for our purposes now can be found at:</br>http://dev.mysql.com/doc/refman/5.7/en/installing-source-distribution.html</p></li>
 
 <li><p>Determine a port for the configuration to listen to.  The MySQL default port = 3306 so let's secure by obscurity and use a different port:</br>
-<b>export MYSQL_DEFAULT_PORT = 3307</b></p></li>
+<b>export MYSQL_DEFAULT_PORT=3307</b></p></li>
 
 <li><p>The access rights for the various files are customarily set according to a user=mysql and a group=mysql.  As with the port, let's again thwart our determined nemeses and use different names:</br><b>export MYSQL_USER=batman</b></br><b>export MYSQL_GROUP=catwoman</b></p></li>
 
@@ -119,7 +119,7 @@ That said, let's doit...
 
 <li><p><b>wget http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-boost-5.7.11.tar.gz</b></p><p>This downloads the source code, including some c++ boost source/headers.</p></li>
 
-<li><p><b>tar xvf mysql-5.7.11.tar.gz</b></p>
+<li><p><b>tar xvf mysql-boost-5.7.11.tar.gz</b></p>
 </p></li>
 
 <li><p><b>cd mysql-5.7.11</b></p>
@@ -130,102 +130,82 @@ Optional.  Gives a brief overview of important configuration parameters. You can
 by using the -D option.  See supra for example.</p>
 </li>
 
-<li><p><b>cmake . -DCMAKE_INSTALL_PREFIX=$STACK_ROOT/mysql -DMYSQL_DATADIR=$STACK_ROOT/mysql</b>
+<li><p><b>cmake . -DCMAKE_INSTALL_PREFIX=$STACK_ROOT/mysql -DMYSQL_DATADIR=$STACK_ROOT/mysql/data -DWITH_BOOST=$STACK_ROOT/mysql-5.7.11/boost</b>
 
-Note: It's probably best to not use a ~ in STACK_ROOT.  Maybe that would work but
+</br>It's probably best to not use a ~ in STACK_ROOT.  Maybe that would work but
 why taunt fate?  Feel free to figure this out at your leisure.</p></li>
 
+<li><p>If you want to start over with cmake, then do <b>rm CMakeCache.txt</b></p></li>
 
-<li><p><b>cmake . -DCMAKE_INSTALL_PREFIX=STACK_ROOT/ubuntu-nginx-php-mysql/mysql -DMYSQL_DATADIR=STACK_ROOT/ubuntu-nginx-php-mysql/mysql</b>
+<li><p><b>make</b></p></li>
 
-Note: It's probably best to not use a ~ in STACK_ROOT.  Maybe that would work but
-why taunt fate?  Feel free to figure this out at your leisure.</p></li>
+<li><p><b>make test</b></p></li>
 
-<li>If you want to start over with cmake, then do <b>rm CMakeCache.txt</b></li>
+<li><p><b>make install</b></p></li>
 
-<li><b>make</b></li>
+<li><p><b>cd $STACK_ROOT/mysql</b></p></li>
+<li><p><b>sudo chown -R $MYSQL_USER .</b></p></li>
+<li><p><b>sudo chgrp -R $MYSQL_GROUP .</b></p></li>
+<li><p><b>sudo bin/mysqld --initialize --user=$MYSQL_USER</b></p><p>This may take a few moments, so please be patient.</p></li>
+<li><p>The output from the prior step includes a temporary password for root@localhost.  Be sure to write this down!</p></li>
 
-<li><b>make test</b></li>
+<li><p><b>cd $STACK_ROOT/mysql</b></p></li>
+<li><p><b>sudo mkdir mysql-files</b></p></li>
+<li><p><b>sudo chmod 750 mysql-files</b></p></li>
 
-<li><b>make install</b></li>
+<li><p><b>sudo chown -R $MYSQL_USER .</b></p></li>
+<li><p><b>sudo chgrp -R $MYSQL_GROUP .</b></p></li>
+</ol>
 
-<li>
-Now we need to install the beginning db that MySQL itself needs in order to function.  For example, the
-grant tables.
-
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql/scripts/mysql_install_db --no-defaults --datadir=STACK_ROOT/ubuntu-nginx-php-mysql/mysql/data  --srcdir=STACK_ROOT/ubuntu-nginx-php-mysql/mysql-5.6.22</b>
-
-The --srcdir option tells mysql_install_db to use the binaries that we've built earlier, not the ones that have been "installed"
-somewhere.  This saves us the trouble of setting the PATH to these binaries.
-
-Please be patient, this takes a few moments to run and will eventually terminate on its own.
-
-After this command has been run, it will display some useful information about how to start and secure the mysql server.
-Read this and compare to these notes.
-
-Also a warning that there's no root password and other security info.
-
-</li>
-
-<li>At this point the MySQL daemon and various utilities are ready to run.  Although the installation created
+<p>At this point the MySQL daemon and various utilities are ready to run.  Although the installation created
 a default conf file, we don't want to use it.  Instead, we'll feed the binaries whatever options via command line.
 The following options are typically used for our application:
 
 <ul>
-<li><b>--no-defaults</b>  If we don't carefully suppress the use of any
-default configuration files, MarieDb will diligently try to find some configuration and it may find
-and use configuration from some other installation.  So we generally want to use this option to prevent that.
+<li><p><b>--no-defaults</b>  If we don't carefully suppress the use of any
+default configuration files, MySQL will diligently try to find some configuration and it may find
+and use configuration from some other installation.  So we generally want to use this option to prevent that.</p>
 </li>
-<li><b>--user=DB_USER</b> The actual db files are owned by this user.  If we don't specify this then
-mysql will typically use the currently logged in user.</li>
-<li><b>--port=MYSQL_DEFAULT_PORT</b> Which TCP/IP port will the program listen on?</li>
-<li><b>--protocol=tcp</b> Sometimes this is required.  Sometimes the use of the --port option apparently implies this option as well.</li>
-<li><b>--datadir=?</b> Where are the datafiles?</li>
-<li><b>--log-error=?</b> Where is the error log?</li>
+<li><p><b>--user=$MYSQL_USER</b> The actual db files are owned by this user.  If we don't specify this then
+MySQL will typically use the currently logged in user.</p></li>
+<li><p><b>--port=MYSQL_DEFAULT_PORT</b> Which TCP/IP port will the program listen on?</p></li>
+<li><p><b>--protocol=tcp</b> Sometimes this is required.  Sometimes the use of the --port option apparently implies this option as well.</p></li>
+<li><p><b>--datadir=?</b> Where are the datafiles?</p></li>
+<li><p><b>--log-error=?</b> Where is the error log?</p></li>
 </ul>
 
-</li>
-
-<li>That said... turn on the MySQL server.
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql/bin/mysqld_safe --no-defaults
-  --log-error=STACK_ROOT/ubuntu-nginx-php-mysql --datadir=STACK_ROOT/ubuntu-nginx-php-mysql/mysql/data
-  --port=3307</b>
-
-Note: No --protocol option used.  Must be implied because of the --port option.
+That said... let's crank it up!
+</br><b>sudo $STACK_ROOT/mysql/bin/mysqld_safe
+ --user=$MYSQL_USER
+ --log-error=$STACK_ROOT/mysql.err --datadir=$STACK_ROOT/mysql/data
+ --port=$MYSQL_DEFAULT_PORT</b>
 
 mysqld_safe is the preferred way to execute mysqld.  This command will _not_ be daemonized and will consume your terminal window.  So append the "&" character to daemonize or open another terminal window for subsequent work.
-</li>
 
-<li>Verify basic installation and operation:
+Verify basic installation and operation:
 
 Verify that mysql is a process:
 
-<b>ps -A | grep "mysqld"</b>
+<b>ps -A | grep mysqld</b>
 
 You should see both "mysqld" and "mysqld_safe"
 
 Verify that mysql is listening on the expected port:
-<b>netstat -lnp  | grep "mysql"</b>
-Do you see "MYSQL_DEFAULT_PORT" and "LISTEN" in there somewhere?
+</br><b>netstat -lnp  | grep mysql</b></br>
+Do you see $MYSQL_DEFAULT_PORT and "LISTEN" in there somewhere?
 
 Stop the server, ending any processes it had.
 
-<b>killall mysqld</b>
-</li>
+<b>killall -r mysql</b>
 
-<li>Review the directory structure, relevant to mysql.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql-5.6.22.tar.gz</b> - This is the original installation media.  Not under SCM.
+Review the directory structure, relevant to mysql.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql-5.6.22</b> - This is the installation source code as extracted from the above.
-Not under SCM.
+<b>STACK_ROOT/mysql-5.7.11.tar.gz</b> - This is the original installation media.  
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/mysql</b> - This contains the MySQL installation that was built from the above.
-Not under SCM.
+<b>STACK_ROOT/mysql-5.7.11</b> - This is the installation source code as extracted from the above.
 
-</li>
-
-</ol>
+<b>STACK_ROOT/mysql</b> - This contains the MySQL installation that was built from the above.
 
 <h3>III. Install PHP</h3>
 
