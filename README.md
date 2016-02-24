@@ -162,6 +162,7 @@ by using the -D option.  See supra for example.</p>
 <p><b>sudo chgrp -R $MYSQL_GROUP .</b></p>
 </ol>
 
+<h4>Post Installation and Initialization</h4>
 <p>At this point the MySQL daemon and various utilities are ready to run.  Although the installation created
 a default conf file, we don't want to use it.  Instead, we'll feed the binaries whatever options via command line.
 The following options are typically used for our application:
@@ -180,37 +181,34 @@ MySQL will typically use the currently logged in user.</p></li>
 </ul>
 
 That said... let's crank it up!
-</br><b>sudo $STACK_ROOT/mysql/bin/mysqld_safe
+<p></br><b>sudo $STACK_ROOT/mysql/bin/mysqld_safe
  --user=$MYSQL_USER
  --log-error=$STACK_ROOT/mysql.err --datadir=$STACK_ROOT/mysql/data
- --port=$MYSQL_DEFAULT_PORT</b>
+ --port=$MYSQL_DEFAULT_PORT</b></p>
 
-mysqld_safe is the preferred way to execute mysqld.  This command will _not_ be daemonized and will consume your terminal window.  So append the "&" character to daemonize or open another terminal window for subsequent work.
+<p>mysqld_safe is the preferred way to execute mysqld.  This command will _not_ be daemonized and will consume your terminal window.  So append the "&" character to daemonize or open another terminal window for subsequent work.</p>
 
-Verify basic installation and operation:
+<h4>Verify basic installation and operation</h4>
 
-Verify that mysql is a process:
-
-<b>ps -A | grep mysqld</b>
-
+<b>sudo ps -A | grep mysqld</b></br>
+Verify that mysql is a process.
 You should see both "mysqld" and "mysqld_safe"
 
-Verify that mysql is listening on the expected port:
-</br><b>netstat -lnp  | grep mysql</b></br>
+<b>netstat -lnp  | grep mysql</b></br>
+Verify that mysql is listening on the expected port.
 Do you see $MYSQL_DEFAULT_PORT and "LISTEN" in there somewhere?
 
+<b>killall -r mysql</b></br>
 Stop the server, ending any processes it had.
 
-<b>killall -r mysql</b>
 
+<h4>Review the directory structure, relevant to MySQL</h4>
 
-Review the directory structure, relevant to mysql.
+<b>$STACK_ROOT/mysql-5.7.11.tar.gz</b> - This is the original installation media.  
 
-<b>STACK_ROOT/mysql-5.7.11.tar.gz</b> - This is the original installation media.  
+<b>$STACK_ROOT/mysql-5.7.11</b> - This is the installation source code as extracted from the above.
 
-<b>STACK_ROOT/mysql-5.7.11</b> - This is the installation source code as extracted from the above.
-
-<b>STACK_ROOT/mysql</b> - This contains the MySQL installation that was built from the above.
+<b>$STACK_ROOT/mysql</b> - This contains the MySQL installation that was built from the above.
 
 <h3>III. Install PHP</h3>
 
@@ -268,64 +266,66 @@ Not under SCM.
 
 <h3>IV. Install php-fpm.</h3>
 
-php-fpm has already been installed via our installation of php.  The versioning is not relevant because it's
-whatever version comes with PHP 5.6.5.  We do however need to configure php-fpm and learn a bit about its
+php-fpm has already been installed via our installation of PHP.  The versioning is not relevant because it's
+whatever version comes with PHP 5.6.18.  We do however need to configure php-fpm and learn a bit about its
 ways and customs.
 
-1. Determine a port for the initial configuration to listen to.  By default it's port 9000.  For this example
+Determine a port for the initial configuration to listen to.  By default it's port 9000.  For this example
 let's use 9001.
 
 PHPFMP_DEFAULT_PORT = 9001
 
-2. Use a custom built configuration provided by this project.
+Use a custom built configuration provided by this project.
 
 The stock configuration is filled with commented out examples.  This just confuses everything.
 The custom built config has _nothing_ except things we specifically want.  We'll otherwise just rely on
 the default operation of php-fpm until and unless we specifically decide otherwise.
 
-<b>ln -s STACK_ROOT/ubuntu-nginx-php-mysql/php-fpm-conf/php-fpm.conf STACK_ROOT/ubuntu-nginx-php-mysql/php/etc/php-fpm.conf</b>
+<b>ln -s $STACK_ROOT/php-fpm-conf/php-fpm.conf $STACK_ROOT/php/etc/php-fpm.conf</b>
 
 
-3. Verify basic installation and operation:
+<h4>Verify basic installation and operation</h4>
 
 Help, version, info.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/sbin/php-fpm --help</b>
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/sbin/php-fpm -v</b>
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/sbin/php-fpm -i</b>
+<b>$STACK_ROOT/php/sbin/php-fpm --help</b></br>
+<b>$STACK_ROOT/php/sbin/php-fpm -v</b></br>
+<b>$STACK_ROOT/php/sbin/php-fpm -i</b>
 
-Test the configuration file:
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/sbin/php-fpm -t</b>
+<b>$STACK_ROOT/php/sbin/php-fpm -t</b>
+</br>Test the configuration file.
 
-This will start the server.
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/sbin/php-fpm</b>
 
-Verify that php-fpm is listening on the expected port:
-<b>netstat -lnp  | grep "php-fpm"</b>
+<b>STACK_ROOT/php/sbin/php-fpm</b></br>This will start the php-fpm server.
+
+<b>netstat -lnp  | grep php-fpm</b></br>
+Verify that php-fpm is listening on the expected port.
+
 Do you see "127.0.0.1:PHP-PFM_DEFAULT_PORT" and "LISTEN"?
 
-Restart the server and reload the config.
-<b>ps -A | grep "php-fpm"</b>
-<b>kill -9 nnnn nnnn nnnn ... </b>
+<b>ps -A | grep php-fpm</b></br>
+<b>killall php-fpm</b></br>
 
-The first command lists the processes visible to this users and will grep the results to only display those
-relevant to php-fpm.
+Stop the php-fpm server.
 
-The second command will kill these processes.  Please substitute nnnn for the actual PIDs from PS.
+<h4>Review the directory structure, relevant to php-fpm</h4>
 
-4. Review the directory structure, relevant to php-fpm.  Recall that php-fpm was installed with PHP so therefore
+Recall that php-fpm was installed with PHP so therefore
 php-fpm will not have it's own original installation media or extracted source or installation directory.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/php-fpm-conf</b> - This contains the versioned configuration files that we develop.
+<b>$STACK_ROOT/php-fpm-conf</b></br>
+This contains the versioned configuration files that we develop.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/sbin/php-fpm</b> - This is the executable binary.
+<b>$STACK_ROOT/php/sbin/php-fpm</b></br>
+This is the executable binary.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/php/etc/php-fpm.conf</b> - This is a link to the configuration file.
+<b>$STACK_ROOT/php/etc/php-fpm.conf</b></br>
+This is a link to the configuration file.
 
 
 <h3>V. Install nginx</h3>
 
-Now it's to install nginx version 1.7.9.
+Now it's time to install nginx version 1.7.9.
 
 <ol>
 <li>Determine a port for the initial configuration to listen to.  As an unprivileged user we cannot use port 80. NGINX_DEFAULT_PORT = 3000</li>
