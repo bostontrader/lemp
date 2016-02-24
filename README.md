@@ -1,12 +1,18 @@
 <h1>Introduction</h1>
-The purpose of this document is to provide/document a build process that
-can build from scratch a LEMP stack, for Ubuntu 15, composed of nginx, php, php-fpm, and mysql.
+The purpose of this directory is to provide/document a build process that
+can build from source code a LEMP stack, for Ubuntu 15.10, composed of Nginx, MySQL, PHP, and php-fpm.
 
 More specifically, we're going to download the source code and build from scratch, the following packages and versions:
 <table>
 <tr><td>Package</td><td>Version</td></tr>
 <tr><td>MySQL</td><td>5.7.11</tr>
+<tr><td>PHP</td><td>5.6.18</tr>
+<tr><td>Nginx</td><td>1.7.9</tr>
 </table>
+
+This directory contains not merely this README file, but also a handful of initial configuration files.  Hence the version control.
+
+Any installation starts with this directory. During the build, we'll download, unzip, and otherwise create lots of new files in this directory. But even though this directory is under git version control, we don't want to add these new files.
 
 <h2>Rebuild from Source Code</h2>
 This process will use .tar.gz (or similar) files containing the source code for all of the above.
@@ -28,8 +34,8 @@ said user has sufficient access rights, such as in his HOME directory.  This wil
 certain non-standard ports.  For example, an ordinary user cannot run a process to bind to port 80.
 
 <h2>Prerequisites</h2>
-Although nginx, php, php-fpm, and mysql can all be installed and executed as an ordinary user,
-the host system still needs a variety of tools build tools.  You will most
+Although Nginx, MySQL, PHP, and php-fpm can all be installed and executed by an ordinary user,
+the host system still needs a variety of build tools.  You will most
 conveniently need to sudo or root access to install these tools, if they are not already installed.
 
 Starting from a fresh install of Ubuntu 15.10, I needed to install the following extra packages
@@ -37,8 +43,9 @@ to get all this to work:
 
 <table>
 <tr><th>Package name</th><th>Why?</th></tr>
-<tr><td>cmake</td><td>Build MySQL</td></tr>
-<tr><td>libncurses5-dev</td><td>Build MySQL</td></tr>
+<tr><td>cmake</td><td>MySQL</td></tr>
+<tr><td>libncurses5-dev</td><td>MySQL <tr><td>libxml2-dev</td><td>PHP</td></tr>
+MySQL</td></tr>
 </table>
 
 <table>
@@ -46,7 +53,6 @@ to get all this to work:
 <tr><td>build-essential</td><td></td></tr>
 <tr><td>g++</td><td></td></tr>
 <tr><td>libpcre3-dev</td><td>nginx</td></tr>
-<tr><td>libxml2-dev</td><td>php</td></tr>
 </table>
 
 Unfortunately, installing all this is outside the scope of this document, so you're on your own with this.
@@ -58,21 +64,19 @@ Ok, here we go...
 <ol>
 
 <li>
-<p>Determine a file-system location for this installation.  Let's refer to that location as STACK_ROOT. In fact, let's export that as an environment variable.</p><p><b>export STACK_ROOT="/home/myhome/lemp"</b></p>  <p>Warning:
-I tried this once using a user's home directory as the STACK_ROOT, which I referred to using the "~".
-But subsequent <b>make install</b> didn't install anything.  So I tried again, using the same directory, but this time
-using the absolute path instead.  This worked.</p>
+<p>Determine a file-system location for this installation.  Let's refer to that location as STACK_ROOT. In fact, let's export that as an environment variable.</p><p><b>export STACK_ROOT=/home/myhome/lemp</b></p>  <p>Warning: If STACK_ROOT is in a user's home directory, you might be tempted to use the ~ as part of the path.  Resist the urge because
+subsequent <b>make install</b> apparently don't like that.</p>
 </li>
 
 <li>
-<p>Remove any prior installation, if desired.</p>
-<p><b>rm -rf $STACK_ROOT</b></p>
-<p>This command will remove this directory, all files and subdirectories within (r) and force it without any prompts (f).</p>
+p><b>rm -rf $STACK_ROOT</b></p>
+<p>Remove any prior installation.</p>
 </li>
 
 <li><p><b>mkdir $STACK_ROOT</b></p></li>
 <li><p><b>cd $STACK_ROOT</b></p></li>
-
+<li><p><b>git clone https://github.com/bostontrader/ubuntu-nginx-php-mysql.git .</b></p>
+<p>Be sure to include the trailing 'dot'  That says to clone the repository with the big awkward name into 'this' directory.</p></li>
 </ol>
 
 
@@ -104,25 +108,25 @@ That said, let's doit...
 
 <li><p>Earlier I referenced the starting point in the MySQL docs for building the source code.  A more specific reference for our purposes now can be found at:</br>http://dev.mysql.com/doc/refman/5.7/en/installing-source-distribution.html</p></li>
 
-<li><p>Determine a port for the configuration to listen to.  The MySQL default port = 3306 so let's secure by obscurity and use a different port:</br>
-<b>export MYSQL_DEFAULT_PORT=3307</b></p></li>
+<li><b>export MYSQL_DEFAULT_PORT=3307</b></br><p>Determine a port for the configuration to listen to.  The MySQL default port = 3306 so let's secure by obscurity and use a different port:</br>
+</p></li>
 
-<li><p>The access rights for the various files are customarily set according to a user=mysql and a group=mysql.  As with the port, let's again thwart our determined nemeses and use different names:</br><b>export MYSQL_USER=batman</b></br><b>export MYSQL_GROUP=catwoman</b></p></li>
+<li><b>export MYSQL_USER=batman</b></br><b>export MYSQL_GROUP=catwoman</b></br><p>The access rights for the various files are customarily set according to a user=mysql and a group=mysql.  As with the port, let's again thwart our determined nemeses and use different names.</p></li>
 
 <li>
-<p>Add the group and user:
-</br><b>groupadd $MYSQL_GROUP</b>
-</br><b>useradd -r -g $MYSQL_GROUP -s /bin/false $MYSQL_USER</b></p>
+<p><b>groupadd $MYSQL_GROUP</b></br>
+<b>useradd -r -g $MYSQL_GROUP -s /bin/false $MYSQL_USER</b></br>Add the group and user, if necessary.
+</p>
 </li>
 
-<li><p>Ensure that you're in the STACK_ROOT directory.</p></li>
+<li><p><b>cd $STACK_ROOT</b></br>Ensure that you're in the STACK_ROOT directory.</p></li>
 
 <li><p><b>wget http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-boost-5.7.11.tar.gz</b></p><p>This downloads the source code, including some c++ boost source/headers.</p></li>
 
 <li><p><b>tar xvf mysql-boost-5.7.11.tar.gz</b></p>
 </p></li>
 
-<li><p><b>cd mysql-5.7.11</b></p>
+<li><p><b>cd $STACK_ROOT/mysql-5.7.11</b></p>
 </p></li>
 
 <li><p><b>cmake -L</b></br>
@@ -132,8 +136,7 @@ by using the -D option.  See supra for example.</p>
 
 <li><p><b>cmake . -DCMAKE_INSTALL_PREFIX=$STACK_ROOT/mysql -DMYSQL_DATADIR=$STACK_ROOT/mysql/data -DWITH_BOOST=$STACK_ROOT/mysql-5.7.11/boost</b>
 
-</br>It's probably best to not use a ~ in STACK_ROOT.  Maybe that would work but
-why taunt fate?  Feel free to figure this out at your leisure.</p></li>
+</p></li>
 
 <li><p>If you want to start over with cmake, then do <b>rm CMakeCache.txt</b></p></li>
 
@@ -142,19 +145,21 @@ why taunt fate?  Feel free to figure this out at your leisure.</p></li>
 <li><p><b>make test</b></p></li>
 
 <li><p><b>make install</b></p></li>
+</ol>
 
+<h4>Post installation</h4>
+<ol>
 <li><p><b>cd $STACK_ROOT/mysql</b></p></li>
 <li><p><b>sudo chown -R $MYSQL_USER .</b></p></li>
 <li><p><b>sudo chgrp -R $MYSQL_GROUP .</b></p></li>
 <li><p><b>sudo bin/mysqld --initialize --user=$MYSQL_USER</b></p><p>This may take a few moments, so please be patient.</p></li>
 <li><p>The output from the prior step includes a temporary password for root@localhost.  Be sure to write this down!</p></li>
 
-<li><p><b>cd $STACK_ROOT/mysql</b></p></li>
-<li><p><b>sudo mkdir mysql-files</b></p></li>
-<li><p><b>sudo chmod 750 mysql-files</b></p></li>
-
-<li><p><b>sudo chown -R $MYSQL_USER .</b></p></li>
-<li><p><b>sudo chgrp -R $MYSQL_GROUP .</b></p></li>
+<li><p><b>cd $STACK_ROOT/mysql</b></p>
+<p><b>sudo mkdir mysql-files</b></p>
+<p><b>sudo chmod 750 mysql-files</b></p>
+<p><b>sudo chown -R $MYSQL_USER .</b></p>
+<p><b>sudo chgrp -R $MYSQL_GROUP .</b></p>
 </ol>
 
 <p>At this point the MySQL daemon and various utilities are ready to run.  Although the installation created
@@ -209,53 +214,56 @@ Review the directory structure, relevant to mysql.
 
 <h3>III. Install PHP</h3>
 
-Now install PHP 5.6.5.  This release also includes php-fpm so that will be installed as well.
+Now install PHP 5.6.18.  This release also includes php-fpm so that will be installed as well.
 We will however configure php-fpm separately.
 
-1. <b>Ensure that you're in the STACK_ROOT/ubuntu-nginx-php-mysql directory.</b>
+<ol>
+<li><p><b>cd $STACK_ROOT</b></br>
+Ensure that you're in the STACK_ROOT/ubuntu-nginx-php-mysql directory.</p></li>
 
-2. <b>wget http://hk1.php.net/distributions/php-5.6.5.tar.bz2</b>
+<li><p><b>wget http://hk1.php.net/distributions/php-5.6.18.tar.bz2</b></p></li>
 
-3. <b>tar -xvf php-5.6.5.tar.bz2</b>
+<li><p><b>tar xvf php-5.6.18.tar.bz2</b></p></li>
 
-4. <b>cd php-5.6.5</b>
+<li><p><b>cd $STACK_ROOT/php-5.6.18</b></p></li>
 
-5. <b>./configure --help</b>  This is optional but possibly useful. Possibly review the modules being loaded and exclude some of them.
+<li><p><b>./configure --help</b></br>This is optional but possibly useful. Possibly review the modules being loaded and exclude some of them.</p></li>
 
-6. <b>./configure --prefix=STACK_ROOT/ubuntu-nginx-php-mysql/php --enable-fpm --with-mysql=STACK_ROOT/ubuntu-nginx-php-mysql/mysql</b>
+<li><p><b>./configure --prefix=$STACK_ROOT/php --enable-fpm --with-mysql=$STACK_ROOT/mysql</b></p></li>
 
 We need fpm!
 
-7. <b>make --help</b> Optional.
+<li><p><b>make --help</b> Optional.</p></li>
 
-8. <b>make</b>
+<li><p><b>make</b></p></li>
 
-9. <b>make test</b>  This may reveal some minor errors.  Don't worry about them.
+<li><p><b>make test</b>  This may reveal some minor errors.  Don't worry about them.</p></li>
 
-10. <b>make install</b>
+<li><p><b>make install</b></p></li>
+</ol>
 
 Note: After installation, there is no initial php.ini.  This will be added later.
 
-11. Verify basic installation and operation of php.
+<h4>Verify basic installation and operation of PHP</h4>
 
+<b>$STACK_ROOT/php/bin/php --version</b></br>
 Look for version or info about php.
-<p>STACK_ROOT/ubuntu-nginx-php-mysql/php/bin/php --version</b>  Does this say 5.6.5?
+  Does this say 5.6.18?
 
-Look at the info....
-<p>STACK_ROOT/ubuntu-nginx-php-mysql/php/bin/php --info</b>
+<b>$STACK_ROOT/php/bin/php --info</b></br>Look at the info....
 
+<b>STACK_ROOT/php/bin/php --info | grep "Loaded Configuration"</b></br>
 Narrow the search for "Loaded Configuration".  Is php using the php.ini we expect?
 At this point, there should be none loaded at all.
-<p>STACK_ROOT/ubuntu-nginx-php-mysql/php/bin/php --info | grep "Loaded Configuration"</b>
 
-12. Review the directory structure, relevant to php.
+<h4>Review the directory structure, relevant to PHP</h4>
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/php-5.6.5.tar.bz2</b> - This is the original installation media.  Not under SCM.
+<b>$STACK_ROOT/php-5.6.5.tar.bz2</b> - This is the original installation media.  Not under SCM.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/php-5.6.5</b> - This is the installation source code as extracted from the above.
+<b>$STACK_ROOT/php-5.6.5</b> - This is the installation source code as extracted from the above.
 Not under SCM.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/php</b> - This contains the php installation that was built from the above. Not under SCM.
+<b>$STACK_ROOT/php</b> - This contains the PHP installation that was built from the above. Not under SCM.
 
 
 <h3>IV. Install php-fpm.</h3>
