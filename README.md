@@ -346,28 +346,16 @@ Now it's time to install nginx version 1.9.12.
   <b>make</b></br>
   <b>make install</b></br></p></li>
 
+</ol>
 
+<h4>Replace the installed configuration directory with a custom built config</h4>
 
-  <li><p><b></b></br></p></li>
+<ol>
+<li><p><b>rm -rf $STACK_ROOT/nginx/conf/\*</b></br>  Remove the contents of the existing directory.</p></li>
 
-
-
-
-
-
-
-<li><b>make --help</b>  Again, this is optional, but may be useful.</li>
-
-</li><b>make</b></li>
-
-<li><b>make install</b></li>
-
-<li>Replace the installed configuration directory with the custom built configuration provided
-by this project.</li>
-
-<li><b>rm -rf STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf/*</b>  Remove the contents of the existing directory.</li>
-
-<li><b>ln -s STACK_ROOT/ubuntu-nginx-php-mysql/nginx-conf/nginx.conf STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf/nginx.conf</b>  Link to new config</li>
+<li><p><b>ln -s $STACK_ROOT/nginx-conf/nginx.conf $STACK_ROOT/nginx/conf/nginx.conf</b></p></br>
+  Link to new config</li>
+</ol>
 
 The stock configuration is filled with commented out examples.  This just confuses everything.
 The custom built config has _nothing_ except things we specifically want.  We'll just rely on
