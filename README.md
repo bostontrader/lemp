@@ -402,16 +402,20 @@ which is the binaries, configuration, log files, and html to serve.  Not under S
 Now it's time to modify our configuration so that we can view a .php file, that contains a call to phpinfo()
 and view this in the browser, via nginx.  Since we're using php-fpm, we'll have to get that properly configured as well.
 
-1. Replace the installed nginx configuration directory with the custom built configuration provided
-by this project.  Note: This is the 2nd custom config that we're using.
+<ol>
+<li><p>Replace the installed nginx configuration directory with the custom built configuration provided
+by this project.  Note: This is the 2nd custom config that we're using.</p></li>
 
-<li><b>ln -sf STACK_ROOT/ubuntu-nginx-php-mysql/nginx-conf/nginx.conf2 STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf/nginx.conf</b>  Link to new config.  This time you'll
-want to force (f) the link to replace the existing link.</li>
+<p><b>ln -sf $STACK_ROOT/nginx-conf/nginx.conf2 $STACK_ROOT/nginx/conf/nginx.conf</b></p><p> Link to new config.  This time you'll
+want to force (f) the link to replace the existing link.</p></li>
 
-<li>Edit nginx/conf/nginx.conf to replace any references to STACK_ROOT with the actual value.</li>
+<li><p>Edit $STACK_ROOT/nginx/conf/nginx.conf to replace STACK_ROOT with the real value.</p></li>
 
-2. Turn on (or reload) nginx.
+<li><p>Turn on (or reload) nginx.</p></li>
 
-3. Turn on php-fpm.
+<li><p>Turn on (or reload) php-fpm.</p></li>
 
-4. From your browser of choice, navigate to localhost:NGINX_DEFAULT_PORT/phpinfo.php.  Do you see the php info message?
+<li><p>From your browser of choice, navigate to localhost:NGINX_DEFAULT_PORT/phpinfo.php.  Do you see the php info message?  You do?  Congrats! Time for a cold one, a fat one, or both!</p></li>
+
+
+</ol>
