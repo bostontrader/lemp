@@ -7,7 +7,7 @@ More specifically, we're going to download the source code and build from scratc
 <tr><td>Package</td><td>Version</td></tr>
 <tr><td>MySQL</td><td>5.7.11</tr>
 <tr><td>PHP</td><td>5.6.18</tr>
-<tr><td>Nginx</td><td>1.7.9</tr>
+<tr><td>Nginx</td><td>1.9.12</tr>
 </table>
 
 This directory contains not merely this README file, but also a handful of initial configuration files.  Hence the version control.
@@ -45,14 +45,8 @@ to get all this to work:
 <tr><th>Package name</th><th>Why?</th></tr>
 <tr><td>cmake</td><td>MySQL</td></tr>
 <tr><td>libncurses5-dev</td><td>MySQL <tr><td>libxml2-dev</td><td>PHP</td></tr>
-MySQL</td></tr>
-</table>
-
-<table>
-<tr><th>Package name</th><th>Why?</th></tr>
-<tr><td>build-essential</td><td></td></tr>
-<tr><td>g++</td><td></td></tr>
 <tr><td>libpcre3-dev</td><td>nginx</td></tr>
+MySQL</td></tr>
 </table>
 
 Unfortunately, installing all this is outside the scope of this document, so you're on your own with this.
@@ -325,27 +319,42 @@ This is a link to the configuration file.
 
 <h3>V. Install nginx</h3>
 
-Now it's time to install nginx version 1.7.9.
+Now it's time to install nginx version 1.9.12.
 
 <ol>
-<li>Determine a port for the initial configuration to listen to.  As an unprivileged user we cannot use port 80. NGINX_DEFAULT_PORT = 3000</li>
+<li><b>export $NGINX_DEFAULT_PORT=3000</b></br><p>Determine a port for the initial configuration to listen to.  As an unprivileged user we cannot use port 80.</p></li>
 
-<li>Ensure that you're in the STACK_ROOT/ubuntu-nginx-php-mysql directory.</li>
+<li><p><b>cd $STACK_ROOT</b></li>
 
-<li><b>wget http://nginx.org/download/nginx-1.7.9.tar.gz</b></li>
+<li><p><b>wget http://nginx.org/download/nginx-1.9.12.tar.gz</b></li>
+<li><p><b>tar xvf nginx-1.9.12.tar.gz</b></br></p></li>
+<li><p><b>cd $STACK_ROOT/nginx-1.9.12</b></br></p></li>
 
-<li><b>tar -xvf nginx-1.7.9.tar.gz</b></li>
+<li><p><b>./configure --help</b></br>
+  This is not strictly necessary, but it may be useful. Possibly review the modules being loaded and exclude some of them.</p></li>
 
-<li><b>cd nginx-1.7.9</b></li>
+  <li><p><b>./configure --prefix=$STACK_ROOT/nginx --without-http_gzip_module</b>
+  <br>Look at the output of configure.  It will tell you that the binaries, the configuration, the logs, etc. are all found inside this directory.</p>
 
-<li><b>./configure --help</b>  This is not strictly necessary, but it may be useful. Possibly review the modules being loaded and exclude some of them.</li>
+  <p>We don't need gzip compression right now, which requires zlib, and it's easier to omit gzip
+   than to install zlib at this time.</p>
+  </li>
 
-<li><b>./configure --prefix=STACK_ROOT/ubuntu-nginx-php-mysql/nginx --without-http_gzip_module</b>
-<br>Note: Look at the output of configure.  It will tell you that the binaries, the configuration, the logs, etc. are all found inside this directory.
+  <li><p><b>make --help</b></br>Optional, but may be useful.</p></li>
 
-<br>We don't need gzip compression right now, which requires zlib, and it's easier to omit gzip
- than to install zlib at this time.
-</li>
+  <li><p>
+  <b>make</b></br>
+  <b>make install</b></br></p></li>
+
+
+
+  <li><p><b></b></br></p></li>
+
+
+
+
+
+
 
 <li><b>make --help</b>  Again, this is optional, but may be useful.</li>
 
