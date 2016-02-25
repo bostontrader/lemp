@@ -188,7 +188,7 @@ That said... let's crank it up!
 Verify that mysql is a process.
 You should see both "mysqld" and "mysqld_safe"
 
-<b>netstat -lnp  | grep mysql</b></br>
+<b>sudo netstat -lnp  | grep mysql</b></br>
 Verify that mysql is listening on the expected port.
 Do you see $MYSQL_DEFAULT_PORT and "LISTEN" in there somewhere?
 
@@ -204,7 +204,7 @@ Stop the server, ending any processes it had.
 
 <b>$STACK_ROOT/mysql</b> - This contains the MySQL installation that was built from the above.
 
-<h3>III. Install PHP</h3>
+<h3>III. Install PHP 5.6.18</h3>
 
 Now install PHP 5.6.18.  This release also includes php-fpm so that will be installed as well.
 We will however configure php-fpm separately.
@@ -290,7 +290,7 @@ Help, version, info.
 </br>Test the configuration file.
 
 
-<b>STACK_ROOT/php/sbin/php-fpm</b></br>This will start the php-fpm server.
+<b>$STACK_ROOT/php/sbin/php-fpm</b></br>This will start the php-fpm server.
 
 <b>netstat -lnp  | grep php-fpm</b></br>
 Verify that php-fpm is listening on the expected port.
@@ -317,7 +317,7 @@ This is the executable binary.
 This is a link to the configuration file.
 
 
-<h3>V. Install nginx</h3>
+<h3>V. Install nginx 1.9.12</h3>
 
 Now it's time to install nginx version 1.9.12.
 
@@ -353,56 +353,47 @@ Now it's time to install nginx version 1.9.12.
 <ol>
 <li><p><b>rm -rf $STACK_ROOT/nginx/conf/\*</b></br>  Remove the contents of the existing directory.</p></li>
 
-<li><p><b>ln -s $STACK_ROOT/nginx-conf/nginx.conf $STACK_ROOT/nginx/conf/nginx.conf</b></p></br>
-  Link to new config</li>
+<li><p><b>ln -s $STACK_ROOT/nginx-conf/nginx.conf $STACK_ROOT/nginx/conf/nginx.conf</b></br>Link to new config</p>
+<p>The stock configuration is filled with commented out examples.  This just confuses everything.
+The custom built config has _nothing_ except things we specifically want.  We'll just rely on
+the default operation of nginx until and unless we specifically decide otherwise.</p>
+</li>
 </ol>
 
-The stock configuration is filled with commented out examples.  This just confuses everything.
-The custom built config has _nothing_ except things we specifically want.  We'll just rely on
-the default operation of nginx until and unless we specifically decide otherwise.
-</li>
+<h4>Verify basic installation and operation</h4>
 
-<li>Verify basic installation and operation:
+<b>$STACK_ROOT/nginx/sbin/nginx -t</b></br>Test the configuration file.
 
-Test the configuration file:
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx/sbin/nginx -t</b>
+<b>$STACK_ROOT/nginx/sbin/nginx &</b></br>
+Start the server. Recall that the "&" symbol makes this command run as a daemon.
 
-This will start the server.
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx/sbin/nginx &</b>
-
-Recall that the "&" symbol makes this command run as a daemon.
-
-Verify that nginx is listening on the expected port:
-<b>netstat -lnp  | grep "nginx"</b>
-Do you see "0 0.0.0.0:NGINX_DEFAULT_PORT" and "LISTEN"?
+<b>netstat -lnp  | grep nginx</b></br>Verify that nginx is listening on the expected port. Do you see "0 0.0.0.0:NGINX_DEFAULT_PORT" and "LISTEN"?
 
 From your browser of choice, view this server, using the NGINX_DEFAULT_PORT.  For example,
 what's the IP address of the server?  Browse to ip-address:NGINX_DEFAULT_PORT.  Do you see the nginx
 welcome message? As an exercise, find this message and modify it in order to verify that you really
 understand where this is being served from.
 
+<b>$STACK_ROOT/nginx/sbin/nginx -s reload</b></br>
 Restart the server and reload the config.
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx/sbin/nginx -s reload</b>
 
+<b>ps -A | grep "nginx"</b></br>
 Display any processes running nginx.  There should be two processes, unless some other nginx
 is running on this server.
-<b>ps -A | grep "nginx"</b>
 
-Stop the server, ending any processes it had.
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx/sbin/nginx -s stop</b>
-</li>
+<b>$STACK_ROOT/nginx/sbin/nginx -s stop</b></br>Stop the server, ending any processes it had.
 
-<li>Review the directory structure, relevant to nginx.
+<h4>Review the directory structure, relevant to nginx</h4>
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx-1.7.9.tar.gz</b> - This is the original installation media.  Not under SCM.
+<b>$STACK_ROOT/nginx-1.9.12.tar.gz</b> - This is the original installation media.  Not under SCM.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx-1.7.9</b> - This is the installation source code as extracted from the above.
+<b>$STACK_ROOT/nginx-1.9.12</b> - This is the installation source code as extracted from the above.
 Not under SCM.  Note: this also contains the original configuration.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx</b> - This contains the nginx installation that was built from the above,
+<b>$STACK_ROOT/nginx</b> - This contains the nginx installation that was built from the above,
 which is the binaries, configuration, log files, and html to serve.  Not under SCM.
 
-<b>STACK_ROOT/ubuntu-nginx-php-mysql/nginx-conf</b> - This contains the versioned configuration files that we develop, that are later copied into the STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf directory.
+<b>$STACK_ROOT/nginx-conf</b> - This contains the versioned configuration files that we develop, that are later copied into the STACK_ROOT/ubuntu-nginx-php-mysql/nginx/conf directory.
 </li>
 </ol>
 
