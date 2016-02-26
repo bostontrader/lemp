@@ -14,6 +14,7 @@ This directory contains not merely this README file, but also a handful of initi
 
 Any installation starts with this directory. During the build, we'll download, unzip, and otherwise create lots of new files in this directory. But even though this directory is under git version control, we don't want to add these new files.
 
+
 <h2>Rebuild from Source Code</h2>
 This process will use .tar.gz (or similar) files containing the source code for all of the above.
 We want to be able to very carefully rebuild the same stack, every time, starting from exactly
