@@ -2,6 +2,8 @@
 The purpose of this directory is to provide/document a build process that
 can build from source code a LEMP stack, for Ubuntu 15.10, composed of Nginx, MySQL, PHP, and php-fpm.
 
+We will optionally install xdebug with PHP.
+
 More specifically, we're going to download the source code and build from scratch, the following packages and versions:
 <table>
 <tr><td>Package</td><td>Version</td></tr>
@@ -46,6 +48,7 @@ to get all this to work:
 <tr><th>Package name</th><th>Why?</th></tr>
 <tr><td>cmake</td><td>MySQL</td></tr>
 <tr><td>libncurses5-dev</td><td>MySQL <tr><td>libxml2-dev</td><td>PHP</td></tr>
+<tr><td>libssl-dev</td><td>PHP</td></tr>
 <tr><td>libpcre3-dev</td><td>nginx</td></tr>
 MySQL</td></tr>
 </table>
@@ -70,8 +73,8 @@ p><b>rm -rf $STACK_ROOT</b></p>
 
 <li><p><b>mkdir $STACK_ROOT</b></p></li>
 <li><p><b>cd $STACK_ROOT</b></p></li>
-<li><p><b>git clone https://github.com/bostontrader/ubuntu-nginx-php-mysql.git .</b></p>
-<p>Be sure to include the trailing 'dot'  That says to clone the repository with the big awkward name into 'this' directory.</p></li>
+<li><p><b>git clone https://github.com/bostontrader/lemp.git .</b></p>
+<p>Be sure to include the trailing 'dot'  That says to clone the repository into 'this' directory.</p></li>
 </ol>
 
 
@@ -245,9 +248,12 @@ Look for version or info about php.
 
 <b>$STACK_ROOT/php/bin/php --info</b></br>Look at the info....
 
-<b>STACK_ROOT/php/bin/php --info | grep "Loaded Configuration"</b></br>
+<b>$STACK_ROOT/php/bin/php --info | grep "Loaded Configuration"</b></br>
 Narrow the search for "Loaded Configuration".  Is php using the php.ini we expect?
 At this point, there should be none loaded at all.
+
+<b>$STACK_ROOT/php/bin/php --info | grep "configure"</b></br>
+This will tell you the exact configuration you used for this build.  This is useful when you return to this later and need to configure new options.
 
 <h4>Review the directory structure, relevant to PHP</h4>
 
@@ -323,7 +329,7 @@ This is a link to the configuration file.
 Now it's time to install nginx version 1.9.12.
 
 <ol>
-<li><b>export $NGINX_DEFAULT_PORT=3000</b></br><p>Determine a port for the initial configuration to listen to.  As an unprivileged user we cannot use port 80.</p></li>
+<li><b>export NGINX_DEFAULT_PORT=3000</b></br><p>Determine a port for the initial configuration to listen to.  As an unprivileged user we cannot use port 80.</p></li>
 
 <li><p><b>cd $STACK_ROOT</b></li>
 
